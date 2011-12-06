@@ -19,6 +19,7 @@ var ChristmasHat = {
     hatImgUrl: '',
     options: {
         canvasElem: '#canvas', 
+        hatCanvasElem: '#hatCanvas', 
         hatElems: ['#hat01', '#hat02'],
         background: 'images/fanfou.jpg' 
     },
@@ -141,17 +142,42 @@ var ChristmasHat = {
         for (i in hats) {
             $(hats[i]).click(function(){
                 console.log('choose hat');
-                var $img = $(this).children('img');
                 t.hatCanMove = true;
-                t.setHatImg($img.attr('src'), $img.width(), $img.height());
+                var $img = $(this).children('img'),
+                    src = $img.attr('src'),
+                    width = $img.width(),
+                    height = $img.height();
+                t.setHatPreview(src, width, height);
+                //t.setHatImg(src, width, height);
+                t.addPreviewHatToCanvas();
                 t.draw();
                 return false;
             });
         }
     },
+    // setup hat preview canvas content
+    setHatPreview: function(src, width, height) {
+        var ctx = this.getHatPreviewCTX(),
+            img = new Image();
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        img.src = src;
+        // TODO: 旋转
+        ctx.translate(ctx.canvas.width/2, ctx.canvas.height/2);
+        ctx.rotate(Math.PI/180*20);  // degrees
+        ctx.drawImage(img, 0, 0, width, height);
+    },
+    // copy preview canvas to big canvas
+    addPreviewHatToCanvas: function() {
+        var ctx = this.getHatPreviewCTX(),
+            url = ctx.canvas.toDataURL('image/png');
+        this.setHatImg(url, ctx.canvas.width, ctx.canvas.height);
+    },
+    getHatPreviewCTX: function() {
+        return $(this.options.hatCanvasElem)[0].getContext('2d');
+    },
     saveToDataURL: function(format) {
         return this.getCTX().canvas.toDataURL(format);
-    }
+    },
 };
 
 var hatApp = ChristmasHat.init();
