@@ -1,0 +1,23 @@
+header, nav, footer, article {display:block;}
+nav {float:left; width:20%;}
+article {float:right; width:79%;}
+footer {clear:both;}
+
+header {
+    height: 80px;
+    line-height: 80px;
+}
+#content {
+    min-height: 500px;
+}
+#wrapper {
+    width: 960px;
+    margin: 0 auto;
+}
+.hide {
+    display: none;
+}
+
+#canvas {
+    border: 1px solid #000;
+}
