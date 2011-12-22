@@ -1,0 +1,5 @@
+== INSTALL ==
+
+1. change `define('PUBLIC_URL', '/path/to/') in `index.php`;
+
+
