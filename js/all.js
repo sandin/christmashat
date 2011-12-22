@@ -6,7 +6,28 @@ var keyCode = {
     LEFT : 37,
     UP : 38,
     RIGHT: 39,
-    DOWN: 40
+    DOWN: 40,
+    W: 87,
+    D: 68,
+    S: 83,
+    A: 65
+};
+
+var NoticeBar = {
+    elem: [],
+    options: {
+        elem: '#notice'
+    }, 
+    init: function(options) {
+        this.options = $.extend({}, this.options, options);
+        this.elem = $(this.options.elem);
+        if (this.elem.length) {
+        }
+        return this;
+    },
+    sendMessage: function(msg) {
+        this.elem.html(msg);
+    }
 };
 
 var ChristmasHat = {
@@ -19,15 +40,14 @@ var ChristmasHat = {
     hatImgUrl: '',
     options: {
         canvasElem: '#canvas', 
-        hatCanvasElem: '#hatCanvas', 
         hatElems: ['#hat01', '#hat02'],
         background: 'images/fanfou.jpg' 
     },
     init: function(options) {
-        this.options = $.extend({}, options, this.options);
+        this.options = $.extend({}, this.options, options);
         this.canvas = $("#canvas");
         this.bindMouseEventListener();
-        //this.bindKeyEventListener();
+        this.bindKeyEventListener();
         this.bindHatsListener();
         this.draw();
         return this;
@@ -38,14 +58,19 @@ var ChristmasHat = {
         this.drawBackground(this.options.background);
         this.drawHat(this.hatPosition[0], this.hatPosition[1],
                 this.hatRotate);
-        //ctx.font = "bold 48px sans-serif";
-        //ctx.fillText("饭", 25, 50);
     },
     drawBackground: function(imageUrl) {
+        console.log('set background :' + imageUrl);
         var ctx = this.getCTX(), 
             img = new Image();
         img.src = imageUrl;
-        ctx.drawImage(img, 0, 0);
+        try { 
+            ctx.drawImage(img, 0, 0);
+        } catch (e) {
+            // some image you cann't draw
+            alert(e.description);
+            this.onError(e);
+        }
     },
     drawHat: function(x, y, rotate) { 
         if (!this.hatImgUrl) 
@@ -53,12 +78,14 @@ var ChristmasHat = {
         console.log('draw hat on :' + x + ',' + y);
         var ctx = this.getCTX(), 
             img = new Image();
+        ctx.save();
         img.src = this.hatImgUrl;
         if (rotate) { // TODO: 旋转
-            ctx.translate(ctx.canvas.width/2, ctx.canvas.height/2);
+            //ctx.translate(ctx.canvas.width/2, ctx.canvas.height/2);
             ctx.rotate(Math.PI/180*rotate);  // degrees
         }
         ctx.drawImage(img, x, y, this.hatSize[0], this.hatSize[1]);
+        ctx.restore();
         this.setHatPosition(x, y);
     },
     getCTX: function() {
@@ -90,21 +117,34 @@ var ChristmasHat = {
                 case keyCode.UP:
                     console.log("UP");
                     t.setHatPosition(null, --t.hatPosition[1]);
+                    t.draw();
                     break;
                 case keyCode.DOWN:
                     console.log("DOWN");
                     t.setHatPosition(null, ++t.hatPosition[1]);
+                    t.draw();
                     break;
                 case keyCode.LEFT:
                     console.log("LEFT");
                     t.setHatPosition(--t.hatPosition[0], null);
+                    t.draw();
                     break;
                 case keyCode.RIGHT:
                     console.log("RIGHT");
                     t.setHatPosition(++t.hatPosition[0], null);
+                    t.draw();
+                    break;
+                case keyCode.D:
+                    console.log("D");
+                    t.hatRotate++;
+                    t.draw();
+                    break;
+                case keyCode.A:
+                    console.log("A");
+                    t.hatRotate--;
+                    t.draw();
                     break;
             }
-            t.draw();
         });
     },
     setHatPosition: function(x, y) {
@@ -147,40 +187,23 @@ var ChristmasHat = {
                     src = $img.attr('src'),
                     width = $img.width(),
                     height = $img.height();
-                t.setHatPreview(src, width, height);
-                //t.setHatImg(src, width, height);
-                t.addPreviewHatToCanvas();
+                t.setHatImg(src, width, height);
                 t.draw();
                 return false;
             });
         }
-    },
-    // setup hat preview canvas content
-    setHatPreview: function(src, width, height) {
-        var ctx = this.getHatPreviewCTX(),
-            img = new Image();
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        img.src = src;
-        // TODO: 旋转
-        ctx.translate(ctx.canvas.width/2, ctx.canvas.height/2);
-        ctx.rotate(Math.PI/180*20);  // degrees
-        ctx.drawImage(img, 0, 0, width, height);
-    },
-    // copy preview canvas to big canvas
-    addPreviewHatToCanvas: function() {
-        var ctx = this.getHatPreviewCTX(),
-            url = ctx.canvas.toDataURL('image/png');
-        this.setHatImg(url, ctx.canvas.width, ctx.canvas.height);
-    },
-    getHatPreviewCTX: function() {
-        return $(this.options.hatCanvasElem)[0].getContext('2d');
     },
     saveToDataURL: function(format) {
         return this.getCTX().canvas.toDataURL(format);
     },
 };
 
-var hatApp = ChristmasHat.init();
+var options = null;
+// background from upload
+if (typeof LDS_settings != 'undefined' && LDS_settings.background) {
+    options = { background: LDS_settings.background };
+}
+var hatApp = ChristmasHat.init(options);
 
 // set profile photo background
 $('#photoForm').submit(function(){

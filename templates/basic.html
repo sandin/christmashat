@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link type="text/css" rel="stylesheet" href="css/reset.css" />
+    <link type="text/css" rel="stylesheet" href="css/style.css" />
+    <link type="text/css" rel="stylesheet" href="css/ui-lightness/jquery-ui-1.8.16.custom.css" />
+    {% block css %} {% endblock %}
+</head>
+<body>
+<div id="wrapper">
+
+<header>
+{% block header %}
+    <h1>Christmas Hat</h1>
+{% endblock %}
+</header>
+
+<nav>
+{% block nav %}
+<ul>
+    <li><a href="?step=1" title="">Step 1: 上传头像</a></li>
+    <li><a href="?step=2" title="">Step 2: 戴圣诞帽</a></li>
+</ul>
+{% endblock %}
+</nav>
+
+<article id="content">
+{% block content %}
+{% endblock %}
+</article>
+
+<footer>
+{% block footer %}
+<a href="http://fanfou.com/lds2012">@三日坊主</a>
+{% endblock %}
+</footer>
+
+</div><!-- /wrapper -->
+<script type="text/javascript" src="js/jquery-1.7.1.js"></script>
+{% block javascript %} {% endblock %}
+</body>
+</html>
+
